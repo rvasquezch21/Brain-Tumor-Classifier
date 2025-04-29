@@ -11,17 +11,26 @@ from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
 
-# Parámetros SE TIENEN QUE CAMBIAR
+# Parámetros
 IMG_SIZE = 224
-DATASET_PATH = "'/Users/pablogarro/BrainTumorClassifier/data /Brain Tumor Data Set'"
-CSV_PATH = "/Users/pablogarro/BrainTumorClassifier/metadata/metadata_rgb_only.csv"
+DATASET_PATH = "data/Brain_Tumor_Data_Set"  # RUTA RELATIVA (para que funcione en Docker también)
+CSV_PATH = "metadata/metadata_rgb_only.csv"
 
 # Cargar metadata
 df = pd.read_csv(CSV_PATH)
-df['label'] = df['class'].map({'tumor': 1, 'no_tumor': 0})
 
+# Filtrar solo imágenes JPEG
+df = df[df['format'] == 'JPEG']
+
+# Mapear clases a 0 (no_tumor) y 1 (tumor)
+df['label'] = df['class'].map({'tumor': 1, 'normal': 0})
+
+# Eliminar filas que tengan labels NaN
+df = df.dropna(subset=['label'])
+
+# Construir rutas de imágenes correctas
 def get_image_path(row):
-    folder = "Brain Tumor" if row['label'] == 1 else "Healthy"
+    folder = "Brain_Tumor" if row['label'] == 1 else "Healthy"
     return os.path.join(DATASET_PATH, folder, row['image'])
 
 df['path'] = df.apply(get_image_path, axis=1)
@@ -32,14 +41,19 @@ labels = []
 
 for idx, row in df.iterrows():
     img_path = row['path']
-    img = cv2.imread(img_path)
-    if img is not None:
-        img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img = preprocess_input(img)
-        images.append(img)
-        labels.append(row['label'])
+    if os.path.exists(img_path):
+        img = cv2.imread(img_path)
+        if img is not None:
+            img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img = preprocess_input(img)
+            images.append(img)
+            labels.append(row['label'])
 
+print(f"Total imágenes cargadas: {len(images)}")
+print(f"Total etiquetas cargadas: {len(labels)}")
+
+# Convertir a arrays
 X = np.array(images)
 y = to_categorical(labels)
 
@@ -72,4 +86,7 @@ loss, accuracy = model.evaluate(X_test, y_test)
 print(f"Test Accuracy: {accuracy:.2%}")
 
 # Guardar modelo
+if not os.path.exists("model"):
+    os.makedirs("model")
 model.save("model/brain_tumor_classifier_mobilenetv2.h5")
+print("\n✅ Modelo guardado exitosamente.")
