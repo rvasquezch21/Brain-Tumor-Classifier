@@ -1,0 +1,6 @@
+outs:
+- md5: a9db35e52389a6f805134d0c342b6784.dir
+  size: 127894760
+  nfiles: 4601
+  hash: md5
+  path: Brain_Tumor_Data_Set
