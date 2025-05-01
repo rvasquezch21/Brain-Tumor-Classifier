@@ -10,9 +10,9 @@ from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
 
-# Parámetros
 IMG_SIZE = 224
-DATASET_PATH = "data/Brain Tumor Data Set"
+# Parámetros
+DATASET_PATH = "data/Brain_Tumor_Data_Set"
 CSV_PATH = "metadata/metadata_rgb_only.csv"
 MODEL_OUTPUT_PATH = "model/brain_tumor_classifier_mobilenetv2.h5"
 
@@ -20,11 +20,11 @@ MODEL_OUTPUT_PATH = "model/brain_tumor_classifier_mobilenetv2.h5"
 df = pd.read_csv(CSV_PATH)
 
 # Mapear clases a 0 y 1
-df['label'] = df['class'].map({'tumor': 1, 'no_tumor': 0})
+df['label'] = df['class'].map({'tumor': 1, 'normal': 0})
 
 # Construir rutas completas a las imágenes
 def get_image_path(row):
-    folder = "Brain Tumor" if row['label'] == 1 else "Healthy"
+    folder = "Brain_Tumor" if row['label'] == 1 else "Healthy"
     return os.path.join(DATASET_PATH, folder, row['image'])
 
 df['path'] = df.apply(get_image_path, axis=1)
