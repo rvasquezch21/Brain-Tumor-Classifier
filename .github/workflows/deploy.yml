@@ -12,6 +12,13 @@ jobs:
       - name: Clonar repositorio
         uses: actions/checkout@v2
 
+      - name: Debug parcial de EC2_KEY (solo para ver encabezado)
+        run: |
+          echo "Primera línea del EC2_KEY:"
+          echo "${{ secrets.EC2_KEY }}" | head -n 1
+          echo "Número de líneas totales:"
+          echo "${{ secrets.EC2_KEY }}" | wc -l
+
       - name: Login en DockerHub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
@@ -29,12 +36,3 @@ jobs:
             docker rm mlops-api || true
             docker pull ${{ secrets.DOCKER_USERNAME }}/mlops-model:dev
             docker run -d -p 8000:8000 --name mlops-api ${{ secrets.DOCKER_USERNAME }}/mlops-model:dev
-
-      - name: Debug parcial de EC2_KEY (solo para ver encabezado)
-        run: |
-          echo "Primera línea del EC2_KEY:"
-          echo "${{ secrets.EC2_KEY }}" | head -n 1
-          echo "Número de líneas totales:"
-          echo "${{ secrets.EC2_KEY }}" | wc -l
-
-      
