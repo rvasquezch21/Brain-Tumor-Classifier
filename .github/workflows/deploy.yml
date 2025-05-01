@@ -2,7 +2,7 @@ name: Deploy modelo ML
 
 on:
   push:
-    branches: [develop]  # Cambiá a otra rama si es necesario
+    branches: [develop]
 
 jobs:
   build-and-deploy:
