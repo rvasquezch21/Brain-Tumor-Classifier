@@ -1,3 +1,9 @@
+on:
+  workflow_dispatch:  # esto habilita botón manual
+  push:
+    branches: [develop]
+
+
 name: Deploy modelo ML
 
 on:
