@@ -36,3 +36,4 @@ jobs:
             docker rm mlops-api || true
             docker pull ${{ secrets.DOCKER_USERNAME }}/mlops-model:dev
             docker run -d -p 8000:8000 --name mlops-api ${{ secrets.DOCKER_USERNAME }}/mlops-model:dev
+
