@@ -2,7 +2,11 @@ from fastapi import FastAPI, UploadFile, File
 from tensorflow.keras.models import load_model
 import numpy as np
 import cv2
+from pydantic import BaseModel
 
+class PredictionResponse(BaseModel):
+    prediction: str
+    confidence: float
 app = FastAPI()
 model = load_model("model/brain_tumor_classifier_mobilenetv2.h5")
 
@@ -19,6 +23,7 @@ async def predict(file: UploadFile = File(...)):
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = img / 127.5 - 1.0
     img = img / 127.5 - 1.0
     img = np.expand_dims(img, axis=0)
 
